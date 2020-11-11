@@ -3,17 +3,26 @@ import xml.etree.ElementTree as XML
 from datetime import datetime
 
 def getXMLtext(node, name):
+  """
+  Read an XML node text and returns it or "-" if the node does not exist
+  """ 
   try: res = node.find(name).text
   except: res = "-"
   if res == None: res = "-"
   return res
 
 def getXMLdate(node, name):
+  """
+  Read an XML node text containing an ISO date and returns it or None if the node does not exist
+  """ 
   try: res = datetime.fromisoformat(node.find(name).text[:19])
   except: res = None
   return res
 
 def getXMLattr(node, name):
+  """
+  Read an XML node attribute and returns it or "-" if the attribute does not exist
+  """
   try: res = node.get(name)
   except: res = "-"
   if res == None: res = "-"
@@ -45,13 +54,16 @@ class BCFcomment:
     return txt
 
   def index(self):
-    try: res = int(self.ModifiedDate.strftime("%Y%m%d%H%M%S"))
+    """
+    Function that returns the Date of the comment as a sort key
+    """
+    try: res = int(self.Date.strftime("%Y%m%d%H%M%S"))
     except: res = "0000"
     return res
 
   def read(self, node):
     """
-    Read BCF Comment from XML node
+    Read BCF Comment from an XML node
     """
     self.Guid           = getXMLattr(node, "Guid")
     self.Date           = getXMLdate(node, "Date")
@@ -99,19 +111,29 @@ class BCFtopic:
     return txt
 
   def index(self):
+    """
+    Function that returns the TopicIndex of the comment as a sort key
+    """
     try: res = int(self.TopicIndex)
     except: res = 0
     return res
 
   def addComment(self, comment):
+    """
+    Append the "BCFcomment" to the topic's Comments list
+    """ 
     self.Comments.append(comment)
 
   def addViewpoint(self, viewpoint):
+    """
+    Append the "BCFviewpoint" to the topic's Viewpoints list
+    """ 
     self.Viewpoints.append(viewpoint)
 
   def read(self, node):
     """
-    Read a BCF topic from an XML node
+    Read a BCF topic from an XML node.
+    Includes Comments and Viewpoints.
     """
     self.Guid           = getXMLattr(node, "Guid")
     self.TopicType      = getXMLattr(node, "TopicType")
@@ -147,13 +169,16 @@ class BCFviewpoint:
     return txt
 
   def index(self):
+    """
+    Function that returns the Viepoint Index of the comment as a sort key
+    """
     try: res = int(self.ViewIndex)
     except: res = 0
     return res
 
   def read(self, node, bcfzip, directory):
     """
-    Read BCF viewpoint from XML
+    Read BCF viewpoint from an XML node and the associated .bcfv file
     """
     if node != None :
       self.Guid      = getXMLattr(node, "Guid")
@@ -202,6 +227,9 @@ class BCFfile:
     if filename!="" : self.read()
 
   def read(self):
+    """
+    Read the active BCF file
+    """
     self.Topics.clear()
     for fi in self.bcfzip.filelist:
       if fi.filename[-10:]=="markup.bcf":
@@ -232,6 +260,9 @@ class BCFfile:
     self.Topics.sort(key=BCFtopic.index)
 
   def getImage(self, filename):
+    """
+    Returns the image data of a snapshot file from the active BCF file
+    """
     data = None
     with self.bcfzip.open(filename) as fi:
       data = fi.read()
