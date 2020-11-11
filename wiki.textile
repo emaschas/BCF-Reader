@@ -1,0 +1,116 @@
+h1=. BCFclass documentation
+
+h2. BCFfile class
+
+This is the main class of the BCF reader.
+if a filename is given, it will be read.
+
+??Example:??
+
+bc. from BCFclass import *
+bcf = BCFfile("sample.bcfzip")
+print(bcf.Topics[0])
+
+h2. Class funtion BCFfile.read()
+
+Read the active BCF file
+This function is automatically called by the class constructor.
+
+h2. Class funtion BCFfile.getImage(filename)
+
+Returns the image data of a snapshot file from the active BCF file
+
+h1. BCFtopic class
+
+h2. Class members
+
+This class represents one topic from the BCF file.
+It has the following members :
+
+* Guid ??string??
+* TopicType ??string??
+* TopicStatus ??string??
+* Title ??string??
+* Priority ??string??
+* TopicIndex ??string??
+* CreationDate ??datetime??
+* CreationAuthor ??string??
+* ModifiedDate ??datetime??
+* ModifiedAuthor ??string??
+* Stage ??string??
+* Description ??string??
+* Viewpoints ??List of "BCFviewpoint":#vpt objects?? 
+* Comments ??List of "BCFcomment":#com objects??
+
+h2. Class funtion BCFtopic.read(node)
+
+Read a BCF topic from an XML node pointing on a "markup.bcf" file of the BCFzip.
+Includes Comments and Viewpoints.
+
+h2. Class funtion BCFtopic.index()
+
+Function that returns the TopicIndex of the comment as a sort key.
+This function is used to sort the Topics by their "Index" attribute.
+
+h2. Class funtion BCFtopic.addComment(comment)
+
+Append one comment to the topic's Comments list.
+The comment is a single BCFcomment object. (see "BCFcomment class":#com)
+
+h2. Class funtion BCFtopic.addViewpoint(viewpoint)
+
+Append the viewpoint to the topic's Viewpoints list
+The viewpoint is a single BCFcomment object. (see "BCFviewpoint class":#vpt)
+
+h1(#vpt). BCFviewpoint class
+
+h2. Class members
+
+* Guid ??string??
+* Viewpoint ??string??
+* Snapshot ??string??
+* ViewIndex ??string??
+* CameraViewPoint ??tuple of 3 floats??
+* CameraDirection ??tuple of 3 floats??
+* CameraUpVector ??tuple of 3 floats??
+* FieldOfView ??float??
+
+h2. Class funtion BCFviewpoint.index()
+
+Function that returns the Viepoint Index of the comment as a sort key
+
+h2. Class funtion BCFviewpoint.read(node, bcfzip, directory)
+
+Read BCF viewpoint from an XML node and the associated .bcfv file in the bcfzip file
+
+h1(#com). BCFcomment class
+
+* Guid ??string??
+* Date ??datetime??
+* Author ??string??
+* Comment ??string??
+* Viewpoint ??string??
+* ModifiedDate ??datetime??
+* ModifiedAuthor ??string??
+
+h2. Class funtion BCFcomment.index()
+
+Function that returns the Date of the comment as a sort key
+
+h2. Class funtion BCFcomment.read(node)
+
+Read BCF Comment from an XML node
+
+h1. Utilities
+
+h2. Funtion getXMLtext(node, name)
+
+Read an XML node text and returns it or "-" if the node does not exist
+
+h2. Funtion getXMLdate(node, name)
+
+Read an XML node text containing an ISO date and returns it or None if the node does not exist
+
+h2. Funtion getXMLattr(node, name)
+
+Read an XML node attribute and returns it or "-" if the attribute does not exist
