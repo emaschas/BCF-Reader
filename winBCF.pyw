@@ -2,6 +2,8 @@ from tkinter import *
 from tkinter import filedialog
 from tkinter import ttk
 
+import sys
+import os
 import xml.etree.ElementTree as XML
 from datetime import datetime
 from BCFclass import *
@@ -127,10 +129,20 @@ im.place(relx=0.0, rely=0.0, relwidth=1, relheight=1)
 
 #--------------------------------------------------------------------------------------------------
 
-filename = filedialog.askopenfilename(
-  initialdir = ".",
-  title = "Select BCF file",
-  filetypes = (("BCF Zip Files","*.bcfzip"), ("BCF Files","*.bcf"), ("All Files","*.*")) )
+filename = ""
+if len(sys.argv) > 1:
+  filename = sys.argv[1]
+  if not os.path.exists(filename): filename = ""
+  if os.path.isdir(filename):
+    os.chdir(filename)
+    filename = ""
+#endif
+if filename == "":
+  filename = filedialog.askopenfilename(
+    initialdir = ".",
+    title = "Select BCF file",
+    filetypes = (("BCF Zip Files","*.bcfzip"), ("BCF Files","*.bcf"), ("All Files","*.*")) )
+#endif
 if filename != "":
   root.title("BCF Reader - " + filename)
   bcf = BCFfile(filename)
