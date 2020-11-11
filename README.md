@@ -1,5 +1,5 @@
 # BCF-Reader
-A python application to read BCF files
-Written in Python 3.8
+'winBCF.pyw' if a python application to read BCF files.
+It is written in Python 3.8
 
-Have a look at the [wiki](https://github.com/emaschas/BCF-Reader/wiki)
+Have a look at the [wiki](https://github.com/emaschas/BCF-Reader/wiki) for more details...
