@@ -1,3 +1,12 @@
+'''
+Collection of classes for BCF file reader.
+
+The main class is BCFfile that reads a *.bcfzip file content.
+
+Emmanuel Maschas - November 2020
+'''
+
+import os
 import zipfile
 import xml.etree.ElementTree as XML
 from datetime import datetime
@@ -29,14 +38,14 @@ def getXMLattr(node, name):
   return res
 
 class BCFcomment:
-  def __init__(self, Guid="", Date=None, Author="", Comment="", Viewpoint="", ModifiedDate=None, ModifiedAuthor=""):
-    self.Guid = Guid
-    self.Date = Date
-    self.Author = Author
-    self.Comment = Comment
-    self.Viewpoint = Viewpoint
-    self.ModifiedDate = ModifiedDate
-    self.ModifiedAuthor = ModifiedAuthor
+  def __init__(self):
+    self.Guid           = ""
+    self.Date           = None
+    self.Author         = ""
+    self.Comment        = ""
+    self.Viewpoint      = ""
+    self.ModifiedDate   = None
+    self.ModifiedAuthor = ""
 
   def __str__(self):
     txt  = "COMMENT :\n========="
@@ -44,7 +53,7 @@ class BCFcomment:
     if self.Date != None:
       txt += "\nDate :           " + self.Date.strftime("%d-%m-%Y")
     else:
-      txt += "\nDate :            -"
+      txt += "\nDate :           -"
     txt += "\nAuthor :         " + self.Author
     if self.ModifiedDate != None and (self.ModifiedDate != self.Date or self.ModifiedAuthor != self.Author) :
       txt += "\nModifiedDate :   " + self.ModifiedDate.strftime("%d-%m-%Y")
@@ -52,6 +61,9 @@ class BCFcomment:
     txt += "\nComment :        " + self.Comment 
     if self.Viewpoint!="-": txt += "\nViewpoint :      " + self.Viewpoint
     return txt
+
+  def __repr__(self):
+    return self.__str__()
 
   def index(self):
     """
@@ -74,19 +86,23 @@ class BCFcomment:
     self.Viewpoint      = getXMLattr(node.find("Viewpoint"), "Guid")
 
 class BCFtopic:
-  def __init__(self, Guid="", TopicType="", TopicStatus="", Title="", Priority="", TopicIndex="", CreationDate=None, CreationAuthor="", ModifiedDate=None, ModifiedAuthor="", Stage="", Description=""):
-    self.Guid = Guid
-    self.TopicType = TopicType
-    self.TopicStatus = TopicStatus
-    self.Title = Title
-    self.Priority = Priority
-    self.TopicIndex = TopicIndex
-    self.CreationDate = CreationDate
-    self.CreationAuthor = CreationAuthor
-    self.ModifiedDate = ModifiedDate
-    self.ModifiedAuthor = ModifiedAuthor
-    self.Stage = Stage
-    self.Description = Description
+  def __init__(self):
+    self.Guid = ""
+    self.TopicType = ""
+    self.TopicStatus = ""
+    self.Title = ""
+    self.Priority = ""
+    self.Index = ""
+    self.Labels = ""
+    self.CreationAuthor = ""
+    self.CreationDate = None
+    self.ModifiedAuthor = ""
+    self.ModifiedDate = None
+    self.DueDate = None
+    self.AssignedTo = ""
+    self.Description = ""
+    self.Stage = ""
+    self.ReferenceLink = ""
     self.Comments = []
     self.Viewpoints = []
 
@@ -96,25 +112,30 @@ class BCFtopic:
     txt += "\nTopicType :      " + self.TopicType
     txt += "\nTopicStatus :    " + self.TopicStatus
     txt += "\nTitle :          " + self.Title
-    if self.Priority!="-": txt += "\nPriority :       " + self.Priority
-    txt += "\nIndex :          " + self.TopicIndex
+    txt += "\nDescription :    " + self.Description
+    if self.Priority != "-":   txt += "\nPriority :       " + self.Priority
+    txt += "\nIndex :          " + self.Index
     if self.CreationDate != None:
       txt += "\nCreationDate :   " + self.CreationDate.strftime("%d-%m-%Y")
-    else:
-      txt += "\nCreationDate :    -"
+    else: # Should not happen...
+      txt += "\nCreationDate :   -"
     txt += "\nCreationAuthor : " + self.CreationAuthor
     if self.ModifiedDate != None and (self.ModifiedDate != self.CreationDate or self.ModifiedAuthor != self.CreationAuthor) :
       txt += "\nModifiedDate :   " + self.ModifiedDate.strftime("%d-%m-%Y")
       txt += "\nModifiedAuthor : " + self.ModifiedAuthor
-    if self.Stage!="-": txt += "\nStage :          " + self.Stage
-    txt += "\nDescription :    " + self.Description
+    if self.AssignedTo != "-": txt += "\nAssignedTo :     " + self.AssignedTo
+    if self.DueDate != None:   txt += "\nDueDate :        " + self.DueDate
+    if self.Stage != "-":      txt += "\nStage :          " + self.Stage
     return txt
+
+  def __repr__(self):
+    return self.__str__()
 
   def index(self):
     """
-    Function that returns the TopicIndex of the comment as a sort key
+    Function that returns the Index of the comment as a sort key
     """
-    try: res = int(self.TopicIndex)
+    try: res = int(self.Index)
     except: res = 0
     return res
 
@@ -140,24 +161,28 @@ class BCFtopic:
     self.TopicStatus    = getXMLattr(node, "TopicStatus")
     self.Title          = getXMLtext(node, "Title")
     self.Priority       = getXMLtext(node, "Priority")
-    self.TopicIndex     = getXMLtext(node, "Index")
-    self.CreationDate   = getXMLdate(node, "CreationDate")
+    self.Index          = getXMLtext(node, "Index")
+    self.Labels         = getXMLtext(node, "Labels")
     self.CreationAuthor = getXMLtext(node, "CreationAuthor")
-    self.ModifiedDate   = getXMLdate(node, "ModifiedDate")
+    self.CreationDate   = getXMLdate(node, "CreationDate")
     self.ModifiedAuthor = getXMLtext(node, "ModifiedAuthor")
-    self.Stage          = getXMLtext(node, "Stage")
+    self.ModifiedDate   = getXMLdate(node, "ModifiedDate")
+    self.DueDate        = getXMLdate(node, "DueDate")
+    self.AssignedTo     = getXMLtext(node, "AssignedTo")
     self.Description    = getXMLtext(node, "Description")
+    self.Stage          = getXMLtext(node, "Stage")
+    self.ReferenceLink  = getXMLtext(node, "ReferenceLink")
 
 class BCFviewpoint:
-  def __init__(self, Guid="", Viewpoint="", Snapshot="", ViewIndex=""):
-    self.Guid = Guid
-    self.Viewpoint = Viewpoint
-    self.Snapshot = Snapshot
-    self.ViewIndex = ViewIndex
-    self.CameraViewPoint = (0,0,0)
-    self.CameraDirection = (0,1,0)
-    self.CameraUpVector = (0,0,1)
-    self.FieldOfView = 60.0
+  def __init__(self):
+    self.Guid            = ""
+    self.Viewpoint       = ""
+    self.Snapshot        = ""
+    self.ViewIndex       = ""
+    self.CameraViewPoint = (0.0, 0.0, 0.0)
+    self.CameraDirection = (0.0, 1.0, 0.0)
+    self.CameraUpVector  = (0.0, 0.0, 1.0)
+    self.FieldOfView     = 60.0
 
   def __str__(self):
     txt  = "VIEWPOINT :\n==========="
@@ -165,8 +190,13 @@ class BCFviewpoint:
     txt += "\nViewpoint :      " + self.Viewpoint
     txt += "\nSnapshot :       " + self.Snapshot
     txt += "\nIndex :          " + self.ViewIndex
-    txt += "\nCameraViewPoint :" + str(self.CameraViewPoint) 
+    txt += "\nCameraViewPoint : X=%.3f Y=%.3f Z=%.3f" % self.CameraViewPoint
+    txt += "\nCameraDirection : X=%.3f Y=%.3f Z=%.3f" % self.CameraDirection
+    txt += "\nCameraUpVector  : X=%.3f Y=%.3f Z=%.3f" % self.CameraUpVector
     return txt
+
+  def __repr__(self):
+    return self.__str__()
 
   def index(self):
     """
@@ -222,9 +252,26 @@ class BCFviewpoint:
 
 class BCFfile:
   def __init__(self, filename=""):
+    self.filename = filename
     self.Topics = []
-    self.bcfzip = zipfile.ZipFile(filename)
-    if filename!="" : self.read()
+    self.bcfzip = None
+    if os.path.exists(filename):
+      if os.path.isfile(filename):
+        self.bcfzip = zipfile.ZipFile(filename)
+        self.read()
+
+  def __str__(self):
+    txt  = "BCF FILE\n========"
+    txt += "\nFile name :      " + self.filename
+    for topic in self.Topics:
+      txt += "\n\n" + topic.__str__()
+      for comment in topic.Comments:
+        txt += "\n\n" + comment.__str__()
+    txt += "\n\n--------"
+    return txt
+
+  def __repr__(self):
+    return self.__str__()
 
   def read(self):
     """
