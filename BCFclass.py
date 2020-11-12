@@ -47,7 +47,7 @@ class BCFcomment:
     self.ModifiedDate   = None
     self.ModifiedAuthor = ""
 
-  def __str__(self):
+  def __repr__(self):
     txt  = "COMMENT :\n========="
     #txt += "\nGuid :           " + self.Guid
     if self.Date != None:
@@ -61,9 +61,6 @@ class BCFcomment:
     txt += "\nComment :        " + self.Comment 
     if self.Viewpoint!="-": txt += "\nViewpoint :      " + self.Viewpoint
     return txt
-
-  def __repr__(self):
-    return self.__str__()
 
   def index(self):
     """
@@ -106,7 +103,7 @@ class BCFtopic:
     self.Comments = []
     self.Viewpoints = []
 
-  def __str__(self):
+  def __repr__(self):
     txt  = "TOPIC :\n======="
     #txt += "\nGuid :           " + self.Guid
     txt += "\nTopicType :      " + self.TopicType
@@ -127,9 +124,6 @@ class BCFtopic:
     if self.DueDate != None:   txt += "\nDueDate :        " + self.DueDate
     if self.Stage != "-":      txt += "\nStage :          " + self.Stage
     return txt
-
-  def __repr__(self):
-    return self.__str__()
 
   def index(self):
     """
@@ -184,7 +178,7 @@ class BCFviewpoint:
     self.CameraUpVector  = (0.0, 0.0, 1.0)
     self.FieldOfView     = 60.0
 
-  def __str__(self):
+  def __repr__(self):
     txt  = "VIEWPOINT :\n==========="
     #txt += "\nGuid :      " + self.Guid
     txt += "\nViewpoint :      " + self.Viewpoint
@@ -194,9 +188,6 @@ class BCFviewpoint:
     txt += "\nCameraDirection : X=%.3f Y=%.3f Z=%.3f" % self.CameraDirection
     txt += "\nCameraUpVector  : X=%.3f Y=%.3f Z=%.3f" % self.CameraUpVector
     return txt
-
-  def __repr__(self):
-    return self.__str__()
 
   def index(self):
     """
@@ -260,18 +251,15 @@ class BCFfile:
         self.bcfzip = zipfile.ZipFile(filename)
         self.read()
 
-  def __str__(self):
+  def __repr__(self):
     txt  = "BCF FILE\n========"
     txt += "\nFile name :      " + self.filename
     for topic in self.Topics:
-      txt += "\n\n" + topic.__str__()
+      txt += "\n\n" + str(topic)
       for comment in topic.Comments:
-        txt += "\n\n" + comment.__str__()
+        txt += "\n\n" + str(comment)
     txt += "\n\n--------"
     return txt
-
-  def __repr__(self):
-    return self.__str__()
 
   def read(self):
     """
