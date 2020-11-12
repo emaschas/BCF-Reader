@@ -1,3 +1,13 @@
+'''
+BCF File reader
+===============
+
+Read a BCF file and display a list of topics and their comments.
+Displays the snapshot picture if available in the BCF file.
+
+E. Maschas - Nov.2020
+'''
+
 from tkinter import *
 from tkinter import filedialog
 from tkinter import ttk
@@ -6,6 +16,7 @@ import sys
 import os
 import xml.etree.ElementTree as XML
 from datetime import datetime
+
 from BCFclass import *
 
 backref = {}
